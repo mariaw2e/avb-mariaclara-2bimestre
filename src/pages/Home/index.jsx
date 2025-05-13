@@ -1,237 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-
-export default function Home() {
-  const [pokemon, setPokemon] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  // Cores personalizadas
-  const colors = {
-    background: "#dcafa3",
-    text: "#5c3a2e",     
-    accent: "#8d5a4a",    
-    light: "#f0e0d8"      
-  };
-
-  // Busca Pokémon por nome/ID ou aleatório
-  const fetchPokemon = async (search = "") => {
-    setLoading(true);
-    try {
-      let pokemonId;
-      if (search) {
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${search.toLowerCase()}`);
-        pokemonId = response.data.id;
-      } else {
-        pokemonId = Math.floor(Math.random() * 151) + 1;
-      }
-      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
-      setPokemon(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar Pokémon:", error);
-      alert("Pokémon não encontrado!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Busca inicial
-  useEffect(() => {
-    fetchPokemon();
-  }, []);
-
-  // Handle search submit
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      fetchPokemon(searchTerm.trim());
-    }
-  };
-
-  return (
-    <div style={{ 
-      backgroundColor: colors.background,
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      padding: "20px"
-    }}>
-      {/* Barra de Pesquisa */}
-      <form 
-        onSubmit={handleSearch}
-        style={{
-          width: "90%",
-          maxWidth: "900px",
-          marginBottom: "20px"
-        }}
-      >
-        <div style={{
-          display: "flex",
-          borderRadius: "25px",
-          overflow: "hidden",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-        }}>
-          <input
-            type="text"
-            placeholder="Pesquisar Pokémon por nome ou ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "12px 20px",
-              border: "none",
-              backgroundColor: colors.light,
-              color: colors.text,
-              fontSize: "1rem"
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "12px 25px",
-              border: "none",
-              backgroundColor: colors.accent,
-              color: colors.light,
-              cursor: "pointer",
-              transition: "background-color 0.3s",
-              fontWeight: "bold"
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = "#c49e93"}
-            onMouseOut={(e) => e.target.style.backgroundColor = colors.accent}
-          >
-            {loading ? "Buscando..." : "Buscar"}
-          </button>
-        </div>
-      </form>
-
-      {/* Card do Pokémon */}
-      <div 
-        style={{ 
-          width: "90%",
-          maxWidth: "900px",
-          backgroundColor: colors.light,
-          padding: "30px",
-          borderRadius: "15px",
-          textAlign: "center",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-          border: `2px solid ${colors.accent}`,
-          cursor: "pointer"
-        }}
-        onClick={() => !loading && fetchPokemon()}
-      >
-        {pokemon && (
-          <>
-            <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center" }}>
-              <div style={{ flex: 1 }}>
-                <img 
-                  src={pokemon.sprites.other["official-artwork"].front_default || pokemon.sprites.front_default} 
-                  alt={pokemon.name}
-                  style={{ 
-                    height: "250px", 
-                    filter: "drop-shadow(0 0 8px rgba(0,0,0,0.2))" 
-                  }}
-                />
-              </div>
-              
-              <div style={{ flex: 1, textAlign: "left", color: colors.text }}>
-                <h3 style={{ 
-                  fontSize: "2.5rem",
-                  textTransform: "capitalize",
-                  margin: "0 0 20px 0",
-                  color: colors.accent
-                }}>
-                  #{pokemon.id.toString().padStart(3, '0')} - {pokemon.name}
-                </h3>
-                
-                <div style={{ marginBottom: "20px" }}>
-                  <h4 style={{ marginBottom: "5px" }}>Tipo(s):</h4>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    {pokemon.types.map((type, index) => (
-                      <span 
-                        key={index} 
-                        style={{
-                          padding: "5px 15px",
-                          borderRadius: "20px",
-                          backgroundColor: getTypeColor(type.type.name),
-                          color: "white",
-                          fontWeight: "bold"
-                        }}
-                      >
-                        {type.type.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                <div style={{ marginBottom: "20px" }}>
-                  <h4 style={{ marginBottom: "5px" }}>Habilidades:</h4>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                    {pokemon.abilities.map((ability, index) => (
-                      <span 
-                        key={index} 
-                        style={{
-                          padding: "5px 15px",
-                          borderRadius: "20px",
-                          backgroundColor: colors.accent,
-                          color: colors.light
-                        }}
-                      >
-                        {ability.ability.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ 
-              marginTop: "30px",
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "15px",
-              color: colors.text
-            }}>
-              {pokemon.stats.map((stat, index) => (
-                <div key={index} style={{ textAlign: "center" }}>
-                  <div style={{ 
-                    fontSize: "0.9rem",
-                    marginBottom: "5px",
-                    fontWeight: "bold"
-                  }}>
-                    {stat.stat.name.toUpperCase().replace("-", " ")}
-                  </div>
-                  <div style={{ 
-                    height: "10px",
-                    backgroundColor: "rgba(0,0,0,0.1)",
-                    borderRadius: "5px",
-                    overflow: "hidden"
-                  }}>
-                    <div 
-                      style={{ 
-                        height: "100%",
-                        width: `${(stat.base_stat / 255) * 100}%`,
-                        backgroundColor: colors.accent,
-                        borderRadius: "5px"
-                      }}
-                    />
-                  </div>
-                  <div style={{ 
-                    fontSize: "1.2rem",
-                    fontWeight: "bold",
-                    marginTop: "5px"
-                  }}>
-                    {stat.base_stat}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
+import { Link } from "react-router-dom";
 
 // Função para cores dos tipos
 function getTypeColor(type) {
@@ -256,4 +25,183 @@ function getTypeColor(type) {
     fairy: "#EE99AC"
   };
   return colors[type] || "#777";
+}
+
+export default function Home() {
+  const [pokemons, setPokemons] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Cores personalizadas (da sua página antiga)
+  const colors = {
+    background: "#dcafa3",  // Rosa claro
+    text: "#5c3a2e",        // Marrom escuro
+    accent: "#8d5a4a",      // Marrom médio
+    light: "#f0e0d8"        // Bege claro
+  };
+
+  // Busca a lista inicial de Pokémon
+  useEffect(() => {
+    const fetchPokemonList = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=151`); // Pegando os primeiros 151
+        const pokemonDetailsPromises = response.data.results.map(pokemon =>
+          axios.get(pokemon.url) // Busca os detalhes de cada Pokémon usando a URL
+        );
+        const pokemonDetails = await Promise.all(pokemonDetailsPromises);
+        setPokemons(pokemonDetails.map(res => res.data));
+      } catch (error) {
+        console.error("Erro ao buscar lista de Pokémon:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPokemonList();
+  }, []);
+
+  return (
+    <div style={{
+      backgroundColor: colors.background,
+      minHeight: "100vh",
+      padding: "40px 20px"   // Aumentei o padding geral
+    }}>
+      <h1 style={{
+        color: colors.text,
+        textAlign: "center",
+        marginBottom: "40px",   // Aumentei o espaçamento
+        fontSize: "2.8rem",
+        textShadow: `2px 2px 4px rgba(0,0,0,0.1)`,
+        fontWeight: "bold"
+      }}>
+        Pokedex fofa da Mariaw2e
+      </h1>
+
+      {loading ? (
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "300px"
+        }}>
+          <div style={{
+            width: "50px",
+            height: "50px",
+            border: `5px solid ${colors.accent}`,
+            borderTopColor: "transparent",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite"
+          }} />
+        </div>
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",   // Cards maiores
+          gap: "30px",   // Aumentei o espaçamento entre cards
+          maxWidth: "1400px",   // Container mais largo
+          margin: "0 auto",
+          padding: "20px"
+        }}>
+          {pokemons.map(pokemon => (
+            <Link
+              to={`/detalhes/${pokemon.name}`}
+              key={pokemon.id}
+              style={{
+                textDecoration: "none",
+                color: colors.text,
+                height: "100%" // Garante que o Link ocupe a altura total do card
+              }}
+            >
+              <div style={{
+                backgroundColor: colors.light,
+                borderRadius: "20px",
+                padding: "25px",   // Mais espaço interno
+                boxShadow: `0 6px 12px ${colors.accent}40`,
+                transition: "all 0.3s ease",
+                cursor: "pointer",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                ':hover': {
+                  transform: "translateY(-8px)",
+                  boxShadow: `0 10px 20px ${colors.accent}60`
+                }
+              }}>
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "15px"   // Espaçamento entre elementos
+                }}>
+                  <img
+                    src={pokemon.sprites?.other?.["official-artwork"]?.front_default || pokemon.sprites?.front_default}
+                    alt={pokemon.name}
+                    style={{
+                      width: "180px",
+                      height: "180px",
+                      objectFit: "contain",
+                      filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))"
+                    }}
+                  />
+                  <div style={{ textAlign: "center" }}>
+                    <h3 style={{
+                      fontSize: "1.8rem",
+                      textTransform: "capitalize",
+                      margin: "10px 0",
+                      color: colors.accent,
+                      fontWeight: "600"
+                    }}>
+                      #{pokemon.id?.toString().padStart(3, '0')} - {pokemon.name}
+                    </h3>
+
+                    <div style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: "12px",   // Mais espaço entre tipos
+                      marginBottom: "15px"
+                    }}>
+                      {pokemon.types?.map((type, index) => (
+                        <span
+                          key={index}
+                          style={{
+                            padding: "6px 15px",
+                            borderRadius: "20px",
+                            backgroundColor: getTypeColor(type.type.name),
+                            color: "white",
+                            fontWeight: "bold",
+                            fontSize: "0.9rem",
+                            boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                          }}
+                        >
+                          {type.type.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <footer style={{
+        marginTop: "60px",   // Mais espaço acima do footer
+        padding: "20px",
+        textAlign: "center",
+        color: colors.text,
+        fontSize: "1rem"
+      }}>
+        <p>Dados providos pela PokeAPI | Projeto Pokémon</p>
+      </footer>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
 }
