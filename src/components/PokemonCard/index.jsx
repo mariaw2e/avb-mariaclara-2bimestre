@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useFavorites } from '../../context/FavoritesContext'; // Importe o hook
-import { HeartFillIcon, HeartOutlineIcon } from 'components/Icons'; // Crie esses ícones no próximo passo
+import { useFavorites } from '../../context/FavoritesContext';
 
-// Função para cores dos tipos (pode ser importada de um arquivo utils/colors.js se for usada em muitos lugares)
+// Função para cores dos tipos (mantenha ou importe de utils/colors.js)
 const getTypeColor = (type) => {
   const colors = {
     normal: "#A8A878", fire: "#F08030", water: "#6890F0", electric: "#F8D030",
@@ -15,7 +14,7 @@ const getTypeColor = (type) => {
   return colors[type] || "#777";
 };
 
-// Cores do layout (podem ser importadas de um arquivo de configuração de tema)
+// Cores do layout (mantenha ou importe de um arquivo de configuração de tema)
 const colors = {
   background: "#dcafa3",
   text: "#5c3a2e",
@@ -51,12 +50,12 @@ const PokemonCard = ({ pokemon }) => {
         transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
         cursor: "pointer",
         height: "100%",
-        width: "100%", // Garante que o card ocupe o espaço disponível no grid
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        position: 'relative', // Para posicionar o botão de favorito
-        ':hover': {
+        position: 'relative',
+        ':hover': { // Note: this ':hover' style won't work with inline styles directly, it's a CSS pseudo-class. You'd need a CSS-in-JS library or a separate CSS file for this.
           transform: "scale(1.05)",
           boxShadow: `0 12px 24px ${colors.accent}60`
         }
@@ -71,13 +70,13 @@ const PokemonCard = ({ pokemon }) => {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            fontSize: '2rem',
+            fontSize: '2rem', // Ajuste o tamanho do coração de texto
             color: favorite ? 'red' : colors.accent, // Cor do coração
-            zIndex: 10 // Garante que o botão esteja acima da imagem
+            zIndex: 10
           }}
           aria-label={favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
-          {favorite ? <HeartFillIcon /> : <HeartOutlineIcon />}
+          {favorite ? '❤️' : '♡'} {/* ÍCONE DE TEXTO AQUI */}
         </button>
 
         <div style={{

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import PokemonDetailCard from '../components/PokemonDetailCard/PokemonDetailCard'; // Importe o componente
+import PokemonDetailCard from '../../components/PokemonDetailCard/'; // Importe o componente
 
 // Funções de cor podem ser removidas se estiverem em um arquivo de utilidade centralizado
 // function getTypeColor(type) { ... }

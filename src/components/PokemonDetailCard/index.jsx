@@ -1,13 +1,19 @@
 import React from 'react';
 import { useFavorites } from '../../context/FavoritesContext';
-import { HeartFillIcon, HeartOutlineIcon } from 'components/Icons';
 
-// Função para cores dos tipos
-function getTypeColor(type) { // Sintaxe de função tradicional
-  const colors = { /* ... cores ... */ };
+// Função para cores dos tipos (mantenha ou importe)
+const getTypeColor = (type) => {
+  const colors = {
+    normal: "#A8A878", fire: "#F08030", water: "#6890F0", electric: "#F8D030",
+    grass: "#78C850", ice: "#98D8D8", fighting: "#C03028", poison: "#A040A0",
+    ground: "#E0C068", flying: "#A890F0", psychic: "#F85888", bug: "#A8B820",
+    rock: "#B8A038", ghost: "#705898", dragon: "#7038F8", dark: "#705848",
+    steel: "#B8B8D0", fairy: "#EE99AC"
+  };
   return colors[type] || "#777";
 };
-// Cores do layout (podem ser importadas)
+
+// Cores do layout (mantenha ou importe)
 const colors = {
   background: "#dcafa3",
   text: "#5c3a2e",
@@ -40,7 +46,7 @@ const PokemonDetailCard = ({ pokemon }) => {
         flexDirection: 'column',
         alignItems: 'center',
         gap: '25px',
-        position: 'relative' // Para posicionar o botão de favorito
+        position: 'relative'
       }}
     >
       {/* Botão de Favoritar */}
@@ -53,13 +59,13 @@ const PokemonDetailCard = ({ pokemon }) => {
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          fontSize: '2.5rem', // Ícone maior
+          fontSize: '2.5rem', // Ajuste o tamanho do coração de texto
           color: favorite ? 'red' : colors.accent,
           zIndex: 10
         }}
         aria-label={favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
       >
-        {favorite ? <HeartFillIcon /> : <HeartOutlineIcon />}
+        {favorite ? '❤️' : '♡'} {/* ÍCONE DE TEXTO AQUI */}
       </button>
 
       <div style={{

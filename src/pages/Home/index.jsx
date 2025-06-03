@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 // import { Link } from "react-router-dom";
 // import { useFavorites } from '../../context/FavoritesContext';
 
-import PokemonCard from '../components/PokemonCard/PokemonCard'; // Importe o componente
+import PokemonCard from '../../components/PokemonCard'; // Importe o componente
 
 // Função para cores dos tipos (remova daqui se mover para um arquivo separado como utils/colors.js)
 function getTypeColor(type) { /* ... cores ... */ }
