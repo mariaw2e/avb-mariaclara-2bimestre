@@ -1,108 +1,140 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-// Remova Link e useFavorites daqui, eles serão usados dentro do PokemonCard
-// import { Link } from "react-router-dom";
-// import { useFavorites } from '../../context/FavoritesContext';
-
-import PokemonCard from '../../components/PokemonCard'; // Importe o componente
-
-// Função para cores dos tipos (remova daqui se mover para um arquivo separado como utils/colors.js)
-function getTypeColor(type) { /* ... cores ... */ }
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import PokemonCard from '../../components/PokemonCard/index.jsx'; // Mantenha o .jsx aqui
+import { colors, typeColors } from '../../config/theme';
 
 export default function Home() {
   const [pokemons, setPokemons] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedType, setSelectedType] = useState("all");
-  const [allTypes, setAllTypes] = useState([]);
-
-  const colors = { /* ... cores do layout ... */ };
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('all');
 
   useEffect(() => {
-    // ... (mesma lógica de busca de pokemons e tipos) ...
     const fetchPokemonList = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/?limit=151`);
+        setError(null);
+        const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
+
         const pokemonDetailsPromises = response.data.results.map(async (pokemon) => {
           const pokemonResponse = await axios.get(pokemon.url);
-          return pokemonResponse.data;
+          // REMOVA O 'return' DAQUI (era a linha 24 que você apontou)
+          return { // ESTE 'return' ESTÁ CORRETO AQUI PARA A FUNÇÃO ASYNC INTERNA
+            id: pokemonResponse.data.id,
+            name: pokemonResponse.data.name,
+            sprites: pokemonResponse.data.sprites,
+            types: pokemonResponse.data.types.map(t => t.type)
+          };
         });
-        const pokemonDetails = await Promise.all(pokemonDetailsPromises);
-        setPokemons(pokemonDetails);
-      } catch (error) {
-        console.error("Erro ao buscar Pokémon:", error);
+
+        const allPokemons = await Promise.all(pokemonDetailsPromises);
+        setPokemons(allPokemons);
+      } catch (err) {
+        setError("Erro ao carregar os Pokémon.");
+        console.error("Erro ao buscar Pokémon:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPokemonList();
-
-    const fetchTypes = async () => {
-      try {
-        const response = await axios.get(`https://pokeapi.co/api/v2/type`);
-        setAllTypes(["all", ...response.data.results.map(type => type.name)]);
-      } catch (error) {
-        console.error("Erro ao buscar tipos:", error);
-      }
-    };
-
-    fetchTypes();
   }, []);
 
-  const filteredPokemons = selectedType === "all"
-    ? pokemons
-    : pokemons.filter(pokemon =>
-      pokemon.types.some(typeInfo => typeInfo.type.name === selectedType)
-    );
-
-  const handleTypeChange = (event) => {
-    setSelectedType(event.target.value);
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
   };
 
+  const handleFilterChange = (event) => {
+    setFilterType(event.target.value);
+  };
+
+  const filteredPokemons = pokemons.filter(pokemon => {
+    const matchesSearch = pokemon.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === 'all' || pokemon.types.some(type => type.name === filterType);
+    return matchesSearch && matchesType;
+  });
+
+  if (loading) return <p style={{ textAlign: 'center', fontSize: '1.5rem', color: colors.text }}>Carregando Pokémon...</p>;
+  if (error) return <p style={{ textAlign: 'center', fontSize: '1.5rem', color: 'red' }}>{error}</p>;
+
+  const allTypes = [...new Set(pokemons.flatMap(p => p.types.map(t => t.name)))].sort();
+
   return (
-    <div style={{ /* ... estilos do container ... */ }}>
-      <h1 style={{ /* ... estilos do título ... */ }}>
-        Pokedex fofa da Mariaw2e
+    <div style={{
+      backgroundColor: colors.background,
+      minHeight: '100vh',
+      padding: '40px 20px',
+      color: colors.text
+    }}>
+      <h1 style={{
+        textAlign: 'center',
+        fontSize: '3.5rem',
+        color: colors.primary,
+        marginBottom: '40px',
+        textShadow: `2px 2px 4px rgba(0,0,0,0.15)`
+      }}>
+        Pokedex Fofa da Mariaw2e
       </h1>
 
-      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <label htmlFor="typeFilter" style={{ marginRight: '10px', color: colors.text }}>Filtrar por Tipo:</label>
-        <select id="typeFilter" value={selectedType} onChange={handleTypeChange} style={{ padding: '8px', borderRadius: '5px', borderColor: colors.accent, color: colors.text, backgroundColor: colors.light }}>
-          {allTypes.map(type => (
-            <option key={type} value={type}>{type === "all" ? "Todos" : type}</option>
-          ))}
-        </select>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '20px',
+        marginBottom: '40px'
+      }}>
+        <input
+          type="text"
+          placeholder="Buscar Pokémon..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          style={{
+            padding: '12px 20px',
+            borderRadius: '10px',
+            border: `1px solid ${colors.primary}`,
+            width: '100%',
+            maxWidth: '400px',
+            fontSize: '1.1rem',
+            backgroundColor: colors.secondary,
+            color: colors.text,
+            boxShadow: `0 4px 8px ${colors.primary}20`,
+            outline: 'none'
+          }}
+        />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <label htmlFor="type-filter" style={{ fontSize: '1.2rem', color: colors.text, fontWeight: 'bold' }}>
+            Filtrar por Tipo:
+          </label>
+          <select
+            id="type-filter"
+            value={filterType}
+            onChange={handleFilterChange}
+            className="filter-select"
+          >
+            <option value="all">Todos</option>
+            {allTypes.map(type => (
+              <option key={type} value={type} style={{ textTransform: 'capitalize' }}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {loading ? (
-        <div style={{ /* ... estilos do loading ... */ }}>{/* ... spinner ... */}</div>
-      ) : (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: "40px",
-          maxWidth: "1400px",
-          width: "90%",
-          margin: "0 auto",
-          padding: "20px",
-          alignItems: "stretch"
-        }}>
-          {filteredPokemons.map(pokemon => (
-            // Use o componente PokemonCard aqui
-            <PokemonCard key={pokemon.id} pokemon={pokemon} />
-          ))}
-        </div>
-      )}
-
-      <footer style={{ /* ... estilos do footer ... */ }}>{/* ... footer ... */}</footer>
-
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: '30px',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        paddingBottom: '50px'
+      }}>
+        {filteredPokemons.map(pokemon => (
+          <PokemonCard key={pokemon.id} pokemon={pokemon} />
+        ))}
+      </div>
     </div>
   );
 }

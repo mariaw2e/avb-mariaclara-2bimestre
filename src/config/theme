@@ -1,0 +1,18 @@
+// src/config/theme.js
+export const colors = {
+  primary: "#8d5a4a", // Um tom mais escuro e quente para elementos principais
+  secondary: "#f0e0d8", // Fundo claro, similar ao que você já tem
+  accent: "#b76e79", // Um rosa mais suave para acentos
+  text: "#5c3a2e", // Cor do texto
+  background: "#dcafa3", // Fundo da página
+  lightGray: "#e0e0e0", // Para bordas sutis ou backgrounds secundários
+  darkGray: "#333333" // Para texto ou elementos mais escuros
+};
+
+export const typeColors = {
+  normal: "#A8A878", fire: "#F08030", water: "#6890F0", electric: "#F8D030",
+  grass: "#78C850", ice: "#98D8D8", fighting: "#C03028", poison: "#A040A0",
+  ground: "#E0C068", flying: "#A890F0", psychic: "#F85888", bug: "#A8B820",
+  rock: "#B8A038", ghost: "#705898", dragon: "#7038F8", dark: "#705848",
+  steel: "#B8B8D0", fairy: "#EE99AC"
+};

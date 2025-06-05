@@ -2,17 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '../../context/FavoritesContext';
 
-// Função para cores dos tipos (mantenha ou importe de utils/colors.js)
-const getTypeColor = (type) => {
-  const colors = {
-    normal: "#A8A878", fire: "#F08030", water: "#6890F0", electric: "#F8D030",
-    grass: "#78C850", ice: "#98D8D8", fighting: "#C03028", poison: "#A040A0",
-    ground: "#E0C068", flying: "#A890F0", psychic: "#F85888", bug: "#A8B820",
-    rock: "#B8A038", ghost: "#705898", dragon: "#7038F8", dark: "#705848",
-    steel: "#B8B8D0", fairy: "#EE99AC"
-  };
-  return colors[type] || "#777";
-};
 
 // Cores do layout (mantenha ou importe de um arquivo de configuração de tema)
 const colors = {
@@ -108,7 +97,7 @@ const PokemonCard = ({ pokemon }) => {
             </h3>
 
             <div style={{
-              display: "flex",
+             display: "flex",
               justifyContent: "center",
               gap: "15px",
               marginBottom: "20px"
@@ -119,17 +108,18 @@ const PokemonCard = ({ pokemon }) => {
                   style={{
                     padding: "8px 18px",
                     borderRadius: "25px",
-                    backgroundColor: getTypeColor(type.type.name),
+                    backgroundColor: typeColors[type.name] || "#777", // MUDANÇA AQUI: de 'type.type.name' para 'type.name'
                     color: "white",
                     fontWeight: "bold",
                     fontSize: "1rem",
                     boxShadow: "0 3px 6px rgba(0,0,0,0.2)"
                   }}
                 >
-                  {type.type.name}
+                  {type.name} {/* MUDANÇA AQUI: de 'type.type.name' para 'type.name' */}
                 </span>
               ))}
             </div>
+
           </div>
         </div>
       </div>

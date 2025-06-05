@@ -2,9 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import PokemonDetailCard from '../../components/PokemonDetailCard/'; // Importe o componente
+// import { typeColors, colors } from '../../config/theme'; // Importe as cores
 
 // Funções de cor podem ser removidas se estiverem em um arquivo de utilidade centralizado
-// function getTypeColor(type) { ... }
+
 
 export default function Detalhes() {
   const { name } = useParams();
@@ -111,6 +112,3 @@ export default function Detalhes() {
     </div>
   );
 }
-
-// typeColors pode ser removido se a função getTypeColor for importada ou definida globalmente
-// const typeColors = { ... };
